@@ -1,0 +1,15 @@
+{
+  "name": "craftix",
+  "version": "1.0.0",
+  "description": "Create a Minecraft launcher using HTML/CSS/JS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/craftix/craftix-cli/tree/master/base",
+  "author": "Adrien 'Litarvan' Navratil <adrien1975@live.fr>",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "electron": "^1.4.1"
+  }
+}
