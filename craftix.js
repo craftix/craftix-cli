@@ -37,10 +37,10 @@ var craftix =
     },
     build: function()
     {
-        console.log('\n=> Building project\n');
+        console.log('=> Building project\n');
         console.log('> Reading build scripts');
 
-        var path = process.cwd() + '/craftix';
+        var path = process.cwd() + '/src/craftix';
 
         if (!fs.existsSync(path + '.json'))
         {

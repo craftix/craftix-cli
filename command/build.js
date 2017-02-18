@@ -11,17 +11,15 @@ module.exports = function(craftix)
 {
     if (craftix.args.length == 0)
     {
-        return console.error('Usage: craftix build <target> [wrapper_config]\n\n' +
+        return console.error('Usage: craftix build <target>\n\n' +
             '' +
             'Args :\n' +
             '    target\n' +
-            '        The target platform. Can be one of "win", "mac", or "jar".\n' +
-            '    wrapper_config\n' +
-            '        craftix-wrapper.json file to pack')
+            '        The target platform. Can be one of "win", "mac", or "jar".\n')
     }
 
     console.log('=> Building and exporting project\n');
-    console.log('> Cleaning output directory');
+    console.log('> Cleaning output directory\n');
 
     rimraf(output, function(err) {
         if (err)
@@ -29,34 +27,19 @@ module.exports = function(craftix)
             return console.err('Error while cleaning output directory : ' + err);
         }
 
-        var file = 'craftix-wrapper.json';
-
-        if (craftix.args.length > 1)
-        {
-            file = craftix.args[1];
-        }
-
-        if (!fs.existsSync(file))
-        {
-            return console.error('Can\'t find the wrapper config "' + file + '"');
-        }
-
-        var config = fs.readFileSync(file);
         var target = craftix.args[0];
 
         if (target == 'win')
         {
-            buildWindows(craftix, config);
+            buildWindows(craftix);
         }
         else if (target == 'mac')
         {
-            buildMac(craftix, config);
+            buildMac(craftix);
         }
         else if (target == 'jar')
         {
-            buildBase(craftix, config, function()
-            {
-            });
+            buildBase(craftix);
         }
         else
         {
@@ -65,9 +48,9 @@ module.exports = function(craftix)
     });
 };
 
-function buildWindows(craftix, config)
+function buildWindows(craftix)
 {
-    buildBase(craftix, config, function(jar)
+    buildBase(craftix, function(jar)
     {
         console.log('=> Building .exe\n');
         console.log('> Searching for Launch4j');
@@ -101,7 +84,7 @@ function buildWindows(craftix, config)
     });
 }
 
-function wrapExe(craftix, config, launch4j, jar)
+function wrapExe(craftix, launch4j, jar)
 {
     console.log('> Wrapping jar');
 }
@@ -114,9 +97,12 @@ function buildMac(craftix, config)
     });
 }
 
-function buildBase(craftix, config, callback)
+function buildBase(craftix, callback)
 {
     var buildConfig = craftix.build();
+    var config = buildConfig.wrapper;
+
+    delete buildConfig.wrapper;
 
     console.log('=> Building JAR using Craftix Wrapper ' + craftix.wrapper + '\n');
 
@@ -131,7 +117,6 @@ function buildBase(craftix, config, callback)
     unzip(jar, extract);
 
     console.log('> Setting up wrapper');
-    config = JSON.parse(config);
     config.launcher = buildConfig;
     config = JSON.stringify(config, null, 4);
 
@@ -145,7 +130,10 @@ function buildBase(craftix, config, callback)
 
     out.on('close', function()
     {
-        callback(file);
+        if (callback)
+        {
+            callback(file);
+        }
     });
 
     archive.on('error', function(err)
